@@ -1,7 +1,7 @@
 package identicon
 
 import (
-	"crypto/md5"
+	"crypto/sha256"
 	"github.com/llgcode/draw2d/draw2dimg"
 	"image"
 	"image/color"
@@ -10,7 +10,7 @@ import (
 )
 
 type Identicon struct {
-	hash       [16]byte
+	hash       [32]byte
 	color      [3]byte
 	grid       []byte // New property to hold the grid
 	gridPoints []GridPoint
@@ -34,8 +34,7 @@ type DrawingPoint struct {
 type Apply func(Identicon) Identicon
 
 func hashInput(input []byte) Identicon {
-	checkSum := md5.Sum(input) // generate checksum from input
-
+	checkSum := sha256.Sum256(input)
 	return Identicon{
 		hash: checkSum,
 	}
