@@ -10,7 +10,6 @@ import (
 )
 
 type Identicon struct {
-	Name       string
 	hash       [16]byte
 	color      [3]byte
 	grid       []byte // New property to hold the grid
@@ -38,7 +37,6 @@ func hashInput(input []byte) Identicon {
 	checkSum := md5.Sum(input) // generate checksum from input
 
 	return Identicon{
-		Name: string(input),
 		hash: checkSum,
 	}
 }

@@ -25,6 +25,6 @@ func main() {
 			log.Fatalf("Output Identicon Image to  web server Fail, err: %v", err)
 		}
 	})
-
+	
 	_ = r.Run(fmt.Sprintf("0.0.0.0: %s", *port))
 }
