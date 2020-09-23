@@ -10,7 +10,8 @@ import (
 
 func main() {
 	var (
-		name = flag.String("name", "", "Set the name where you want to generate an Identicon for")
+		name = flag.String("name", "", "Identicon Name")
+		path = flag.String("path", "/", "Generate Image path on Disk")
 	)
 	flag.Parse()
 
@@ -23,7 +24,7 @@ func main() {
 
 	i := identicon.Generate(data)
 
-	f, err := os.Create(i.Name + ".png")
+	f, err := os.Create(fmt.Sprintf("%s/%s.png", *path, *name))
 	if err != nil {
 		fmt.Printf("error:Output Identicon Image Fail, err:  %v", err)
 		return
