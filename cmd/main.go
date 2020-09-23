@@ -21,11 +21,16 @@ func main() {
 
 	data := []byte(*name) // utf8 to byte(10)
 
-	fmt.Println(*name)
-	fmt.Println(data[:])
 	i := identicon.Generate(data)
 
-	if err := i.WriteImage(); err != nil {
+	f, err := os.Create(i.Name + ".png")
+	if err != nil {
+		fmt.Printf("error:Output Identicon Image Fail, err:  %v", err)
+		return
+	}
+	defer f.Close()
+
+	if err := i.WriteImage(f); err != nil {
 		log.Fatalln(err)
 	}
 }

@@ -5,10 +5,12 @@ import (
 	"github.com/llgcode/draw2d/draw2dimg"
 	"image"
 	"image/color"
+	"image/png"
+	"io"
 )
 
 type Identicon struct {
-	name       string
+	Name       string
 	hash       [16]byte
 	color      [3]byte
 	grid       []byte // New property to hold the grid
@@ -36,7 +38,7 @@ func hashInput(input []byte) Identicon {
 	checkSum := md5.Sum(input) // generate checksum from input
 
 	return Identicon{
-		name: string(input),
+		Name: string(input),
 		hash: checkSum,
 	}
 }
@@ -51,7 +53,7 @@ func pickColor(identicon Identicon) Identicon {
 
 func buildGrid(identicon Identicon) Identicon {
 
-	grid := []byte{} // Create empty grid
+	var grid []byte // Create empty grid
 	// Loop over the hash from the identicon
 	// Increment with 3 (Chunk the array in 3 parts)
 	// this ensures we wont get array out of bounds error and will retrieve exactly 5 chunks of 3
@@ -68,7 +70,7 @@ func buildGrid(identicon Identicon) Identicon {
 }
 
 func filterOddSquares(identicon Identicon) Identicon {
-	grid := []GridPoint{}                 // create a placeholder to hold the values of the loop
+	var grid []GridPoint                  // create a placeholder to hold the values of the loop
 	for i, code := range identicon.grid { // loop over the grid
 		if code%2 == 0 { // check if the value is odd or not
 			// create a new Gridpoint where we save the value and the index in the grid
@@ -86,7 +88,7 @@ func filterOddSquares(identicon Identicon) Identicon {
 }
 
 func buildPixelMap(identicon Identicon) Identicon {
-	drawingPoints := []DrawingPoint{} // define placeholder for drawingpoints
+	var drawingPoints []DrawingPoint // define placeholder for drawingpoints
 
 	// Closure, this function returns a Drawingpoint
 	pixelFunc := func(p GridPoint) DrawingPoint {
@@ -141,11 +143,11 @@ func Generate(input []byte) Identicon {
 	return identicon
 }
 
-func (i Identicon) WriteImage() error {
+func (i Identicon) WriteImage(w io.Writer) error {
 	// We create our default image containing a 250x250 rectangle
 	var img = image.NewRGBA(image.Rect(0, 0, 250, 250))
 	// We retrieve the color from the color property on the identicon
-	col := color.RGBA{i.color[0], i.color[1], i.color[2], 255}
+	col := color.RGBA{R: i.color[0], G: i.color[1], B: i.color[2], A: 255}
 
 	// Loop over the pixelmap and call the rect function with the img, color and the dimensions
 	for _, pixel := range i.pixelMap {
@@ -158,6 +160,6 @@ func (i Identicon) WriteImage() error {
 			float64(pixel.bottomRight.y),
 		)
 	}
-	// Finally save the image to disk
-	return draw2dimg.SaveToPngFile(i.name+".png", img)
+
+	return png.Encode(w, img)
 }
